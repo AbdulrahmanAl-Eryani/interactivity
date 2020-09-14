@@ -27,7 +27,7 @@ function onDocumentReady() {
     onMicSuccess, // call this when ready
     error => { console.error('Could not init microphone', error); });
 
-  setInterval(updateDisplay, 300);
+  setInterval(updateDisplay, 50);
 }
 
 // Microphone successfully initalised, we now have access to audio data
@@ -47,7 +47,7 @@ function onMicSuccess(stream) {
   // smoothingTimeConstant ranges from 0.0 to 1.0
   // 0 = no averaging. Fast response, jittery
   // 1 = maximum averaging. Slow response, smooth
-  analyser.smoothingTimeConstant = 0.5;
+  analyser.smoothingTimeConstant = 0.2;
 
   // Low and high shelf filters. Gain is set to 0 so they have no effect
   // could be useful for excluding background noise.
@@ -122,9 +122,9 @@ function analyse() {
   
   //clamping the floating to stay between 0 and 1
   if(floatX > 1){
-    floatX = 1
+  floatX = 1
   } else if(floatX < 0) {
-    floatX = 0
+  floatX = 0
   }
 
   //Making the object float relatively to the width of the container
@@ -228,18 +228,28 @@ function updateDisplay() {
   
   var image = document.getElementById("image")
 
-  var calc = heightContainer/200 * currentBpm
+  // var calc = heightContainer/200 * currentBpm
 
   //We logged the height and the calc to see if these were working as expected.
   //console.log(heightContainer)
 
-  //console.log(calc);
-
   //Constraining the balloon to stay within the container by making it float up to the top if it reaches the bottom.
-  if(currentBpm > 270) {
-    image.style.paddingTop = 400 + "px";
-  } else {
-    image.style.paddingTop = calc + "px";
+  if(currentBpm > 1 && currentBpm < (window.innerHeight/2)) {
+    // let diffFromPossibleMax = window.innerHeight ;
+    let newPaddingTop = (window.innerHeight - (currentBpm * 4))
+    // If new padding is less than zero due to a small window then set it to 0px
+    if( newPaddingTop < 0 )
+    {
+      image.style.paddingTop = 0 + "px";
+    }
+    // Else set the paddingTop with the new value
+    else{
+      image.style.paddingTop = newPaddingTop + "px";
+    }
+  }
+  // When there is no sound set the ballon position to the lowest minus a small margin for the balloon image
+  else {
+    image.style.paddingTop = window.innerHeight - 150 + "px";
   }  
 
 }
